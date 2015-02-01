@@ -25,7 +25,7 @@ def hue_compare(hue,target,thresh):
     else:
         return False
 
-def colorCOMfinder(hlsTarget, testPic, hlsThresh=(20,50,50)):
+def colorCOMfinder(hlsTarget, testPic, hlsThresh=(20,50,50), show=False):
     """Finds the center of mass of a color in testPic and shows a new
        picture of the target colors grayed out and marked with a cross.
 
@@ -69,11 +69,12 @@ def colorCOMfinder(hlsTarget, testPic, hlsThresh=(20,50,50)):
     if count > 10: 
         comx = round(comx/count)
         comy = round(comy/count)
-        boxCorner = (comx - round(cross.size[0]/2),comy - round(cross.size[1]/2))
 
-        mod = img.fromarray(data)
-        mod.paste(cross,boxCorner,cross)
-        mod.show()
+        if show:
+            box_corner = (comx - round(cross.size[0]/2),comy - round(cross.size[1]/2))
+            mod = img.fromarray(data)
+            mod.paste(cross,box_corner,cross)
+            mod.show()
         
     else: print("None of that color found")
 

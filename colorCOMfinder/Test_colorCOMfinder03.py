@@ -1,9 +1,7 @@
 import time
-import timeit
-from colorCOMfinder03 import *
 from PIL import Image as img
+from colorCOMfinder03 import *
 
-# TODO time performance of each colorCOMfinder call and compare against img size
 
 testSuite = (4,)
 

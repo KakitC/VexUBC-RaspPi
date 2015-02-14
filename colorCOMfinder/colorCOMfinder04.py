@@ -69,10 +69,11 @@ def gen_px_list(res):
 
         px_list += sub_list
 
-    return [xy for xy in px_list if (0 <= xy[0] < h) and (0 <= xy[1] < w)]
+    return [xy for xy in px_list if (0 <= xy[0] < h) and (0 <= xy[1] < w)
+            and (xy[0] % 2 == 0 and xy[1] % 2 == 0)]
 
 
-def hls_rgb_range(hls_target, hls_thresh):
+def gen_rgb_range(hls_target, hls_thresh):
     """ Transform a target HLS range into less picky RGB range.
 
         Creates a 3x2 list of min and max RGB pairs. Not a
@@ -153,10 +154,11 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_flag=False):
             test_pic: <Image> Picture to locate a color blob in
             hls_target: <3-tuple> HLS value (0-255) to search for
             hls_thresh: <3-tuple> Threshold range for picking out target color
-            show_flag: <bool> Flag to show_flag a modified, searched copy of the picture
+            show_flag: <bool> Flag to show_flag a modified, searched copy of
+                        the picture
         Returns:
-            <2-tuple> Coordinates of center of detected blob, or (-1,-1) if not
-                      found
+            <2-tuple> Coordinates of center of a detected blob, or (-1,-1)
+                    if not found
         """
 
     global blob_min_size
@@ -169,7 +171,7 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_flag=False):
     else:
         img_data = np.array(pic)
 
-    target_arr = hls_rgb_range(hls_target, hls_thresh)
+    target_arr = gen_rgb_range(hls_target, hls_thresh)
     height, width, _ = img_data.shape
     px_search_list = gen_px_list((height, width))
 
@@ -182,7 +184,8 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_flag=False):
             img_data[px[0]][px[1]][3] = checked_alpha
 
         else:
-            #TODO This is slow, especially on large blotches of hit color
+            # This is still slow, especially on large blotches of hit color
+            # TODO make a perimeter search algorithm as another function
             # print("we got one!")
             hit_stack.append(px)
             hit_px_list.append(px)
@@ -209,7 +212,7 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_flag=False):
             show(img_data, (com_x, com_y))
     else:
         com_x, com_y = (-1, -1)  # Error code, not found
-        print("none of that colour found")
+        # print("none of that colour found")
 
     return com_x, com_y
 
@@ -225,7 +228,6 @@ If hit, set alpha to 0, add position to hit_list, add pixel to hit_stack
 Do DFS with stack to find all contiguous hit px's, marking A to 0
 Check that hit_list length is bigger than threshold, get CoM coord, return
 Else continue searching list
-
 
 Rehighlight red pixels from list to debug
 Don't hsl convert every pixel, convert targets and thresholds to rgb, then compare

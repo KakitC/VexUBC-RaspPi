@@ -31,14 +31,13 @@ print("100000 pixel_compare()'s takes", time.time() - t0, "seconds.")
 # Functionality tests
 test_suite = [4]
 
-# todo change tests to new function
 # look for red in testColors pics
 if 1 in test_suite:    
     file_colors = ['testColor' + str(x+1) + '.png' for x in range(4)]
     for filename in file_colors:
         print(filename)
         t0 = time.time()
-        color_com_finder(img.open(filename), red, show=True)
+        print(color_com_finder(img.open(filename), red, show_flag=True))
         print(time.time() - t0)
 
 # look for red-ish in testImg pics
@@ -47,7 +46,7 @@ if 2 in test_suite:
     for filename in file_imgs:
         print(filename)
         t0 = time.time()
-        color_com_finder(img.open(filename), red, loose, show=True)
+        print(color_com_finder(img.open(filename), red, picky, show_flag=True))
         print(time.time() - t0)
 
 # look for red in testPic photos    
@@ -56,14 +55,16 @@ if 3 in test_suite:
     for filename in file_pics:
         print(filename)
         t0 = time.time()
-        color_com_finder(img.open(filename), red, (15,30,30), show=True)
+        print(color_com_finder(img.open(filename), red,
+                               (15, 30, 30), show_flag=True))
         print(time.time() - t0)
 
 # Performance testing on lower res pics
 if 4 in test_suite:
-    file_pics_small = ['testPic' + str(x+1) + 'small.jpg' for x in range(1)]
+    file_pics_small = ['testPic' + str(x+1) + 'small.jpg' for x in range(4)]
     for filename in file_pics_small:
         print(filename)
         t0 = time.time()
-        print(color_com_finder(img.open(filename), red, (15, 30, 30), True))
+        print(color_com_finder(img.open(filename), red,
+                               (15, 30, 30), show_flag=False))
         print(time.time() - t0)

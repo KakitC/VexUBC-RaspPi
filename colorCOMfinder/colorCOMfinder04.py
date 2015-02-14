@@ -25,7 +25,7 @@ def neighbor_px(px, img_data):
         and have not been searched yet, determined by the pixel alpha channel.
 
         Args:
-            px: <tuple> Coordinates of current pixel
+            px: <2-tuple> Coordinates of current pixel
             img_data: <np.Array> 3D array of image data (MxNxRGBA)
         Returns:
             List of unchecked, valid neighboring px's
@@ -44,6 +44,32 @@ def neighbor_px(px, img_data):
         neighbors.append((m, n + 1))
 
     return neighbors
+
+
+def gen_px_list(res):
+    """ Generate a list of px coordinates to search through.
+
+        Args:
+            res - <2-tuple> Size of image array (height, width)
+        Returns:
+            <List> a list of px coordinates, as a square spiral out from center
+    """
+
+    h, w = res
+    ctr = [int(h / 2), int(w / 2)]
+    # Make a square spiral list
+    px_list = [ctr, [ctr[0], ctr[1] + 1]]  # center, right one
+    for l in range(2, max(h, w), 2):
+        sub_list = [[px_list[-1][0] + 1, px_list[-1][1]]]  # One up of last
+        # Up - 1, left, down, right
+        sub_list += [[sub_list[-1][0], sub_list[-1][1] - n] for n in range(1, l + 1)]
+        sub_list += [[sub_list[-1][0] - m, sub_list[-1][1]] for m in range(1, l + 1)]
+        sub_list += [[sub_list[-1][0], sub_list[-1][1] + n] for n in range(1, l + 2)]
+        sub_list += [[sub_list[-1][0] + m, sub_list[-1][1]] for m in range(1, l + 1)]
+
+        px_list += sub_list
+
+    return [xy for xy in px_list if (0 <= xy[0] < h) and (0 <= xy[1] < w)]
 
 
 def hls_rgb_range(hls_target, hls_thresh):
@@ -94,18 +120,30 @@ def hls_rgb_range(hls_target, hls_thresh):
 
     return rgb_arr
 
+
 def show(pic_data, coords):
-    # TODO document this
+    """ Display a copy of the input picture with the target color marked
+        with a cross.
+
+        Doesn't run if there is none of that color in the picture.
+
+        Args:
+            pic_data: <Array> Modified image data from search result
+            coords: <2-tuple> x-y coordinates of center of mass of target
+        Returns:
+            None
+       """
+
     pic = Image.fromarray(pic_data)
     cross = Image.open('Black cross 64.png')
 
     box_corner = (coords[0] - round(cross.size[0]/2),
                   coords[1] - round(cross.size[1]/2))
-    pic.paste(cross, box_corner, cross)
+    pic.paste(cross, tuple(box_corner), cross)
     pic.show()
 
 
-def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_Flag=False):
+def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_flag=False):
     """ Finds the center of a contiguous blob of color in an image, and
         returns the coordinates.
 
@@ -115,7 +153,7 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_Flag=False):
             test_pic: <Image> Picture to locate a color blob in
             hls_target: <3-tuple> HLS value (0-255) to search for
             hls_thresh: <3-tuple> Threshold range for picking out target color
-            show_Flag: <bool> Flag to show_Flag a modified, searched copy of the picture
+            show_flag: <bool> Flag to show_flag a modified, searched copy of the picture
         Returns:
             <2-tuple> Coordinates of center of detected blob, or (-1,-1) if not
                       found
@@ -124,7 +162,7 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_Flag=False):
     global blob_min_size
     global checked_alpha
     blob_min_size = 10
-    checked_alpha = 50
+    checked_alpha = 127
 
     if pic.mode != "RGBA":
         img_data = np.array(pic.convert(mode="RGBA"))
@@ -132,25 +170,20 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_Flag=False):
         img_data = np.array(pic)
 
     target_arr = hls_rgb_range(hls_target, hls_thresh)
-
     height, width, _ = img_data.shape
-    start_px = (int(height / 2), int(width / 2))
-    # A (px) is a position vector - [pixel] is an RGBA 1x4 vector
-    search_queue = deque([])  # Right side is the exit, left is the entrance
+    px_search_list = gen_px_list((height, width))
+
     hit_stack = deque([])
     hit_px_list = []
 
-    search_queue.appendleft(start_px)
-    while search_queue:
-        px = search_queue.pop()
-
-        if not pixel_compare(img_data[px[0]][px[1]], target_arr):
-            for i in neighbor_px(px, img_data):
-                search_queue.appendleft(i)
+    for px in px_search_list:
+        if not img_data[px[0]][px[1]][3] == checked_alpha \
+                and not pixel_compare(img_data[px[0]][px[1]], target_arr):
             img_data[px[0]][px[1]][3] = checked_alpha
 
         else:
-            print("we got one!")
+            #TODO This is slow, especially on large blotches of hit color
+            # print("we got one!")
             hit_stack.append(px)
             hit_px_list.append(px)
             while hit_stack:
@@ -162,20 +195,21 @@ def color_com_finder(pic, hls_target, hls_thresh=(20, 50, 50), show_Flag=False):
                     img_data[x[0]][x[1]][3] = checked_alpha
                     img_data[x[0]][x[1]][0:3] = [255, 255, 255]
             if len(hit_px_list) >= blob_min_size:
-                print("we're done here")
+                # print("we're done here")
                 break
             hit_px_list.clear()
-            print("nevermind")
+            # print("nevermind")
 
     if hit_px_list:
         com_x = sum([hit_px_list[i][1] for i in range(len(hit_px_list))])
         com_y = sum([hit_px_list[i][0] for i in range(len(hit_px_list))])
         com_x = int(com_x / len(hit_px_list))
         com_y = int(com_y / len(hit_px_list))
-        if show_Flag:
+        if show_flag:
             show(img_data, (com_x, com_y))
     else:
         com_x, com_y = (-1, -1)  # Error code, not found
+        print("none of that colour found")
 
     return com_x, com_y
 
@@ -184,22 +218,18 @@ credit to James and Vincent for the idea, with their line following
     algorithm expecting the track to start in the center bottom of the screen
 OpenCV not available for Python 3, aw
 
-(red)
-Start in center
-Check redness of pixel, neighbors
-Set all alpha to 0
-Add neighbors position to deque queue
-Iterate through queue, checking neighbors and setting A to 0 to mark checked already
-//add a way to stop double checking pixels
-If neighbors out of bounds, don't check or add to queue
-If red, still set alpha to 0, add position to list, add that pixel to deque as a stack
-Once the first red seen, DFS with stack to find all contiguous red pixels, adding non red to queue
-//add some way to prioritize pixels near red blob after going back to main search loop
-Check that red list length is bigger than threshold once all red pixels are finished (how?), return CoM of list
-Else continue going through queue
-Return error if no contiguous blob found
+Generate a list of pixels to search in order (start in center, spiral outwards)
+Iterate through list, just checking (not checked already) && (not matching)
+Set A to 0 to mark checked
+If hit, set alpha to 0, add position to hit_list, add pixel to hit_stack
+Do DFS with stack to find all contiguous hit px's, marking A to 0
+Check that hit_list length is bigger than threshold, get CoM coord, return
+Else continue searching list
+
 
 Rehighlight red pixels from list to debug
-Don't hsl convert every pixel, convert targets and thresholds to rgb, then compare"""
+Don't hsl convert every pixel, convert targets and thresholds to rgb, then compare
+Stop double checking pixels
+"""
 
 

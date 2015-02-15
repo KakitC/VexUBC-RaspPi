@@ -34,9 +34,10 @@ if 3 in testSuite:
 
 # Performance testing on lower res pics
 if 4 in testSuite:
-    filePics = ['testPic' + str(x+1) + 'small.jpg' for x in range(4)]
+    filePics = ['testPic' + str(x+1) + 'small.jpg' for x in range(5)]
     for filename in filePics:
         print(filename)
         t0 = time.time()
         colorCOMfinder((0, 127, 255), img.open(filename), (15, 50, 120))
         print(time.time() - t0)
+

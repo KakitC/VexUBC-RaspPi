@@ -70,9 +70,9 @@ if 4 in test_suite:
         print(filename)
         pic = img.open(filename)
         print(color_com_finder(pic, red,
-                               (15, 30, 30), show_flag=True))
+                               (15, 30, 30), show_flag=False))
 
-        n = 5
+        n = 10
         t0 = time.time()
         for i in range(n):
             color_com_finder(pic, red,

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/colorCOMfinder.iml" filepath="$PROJECT_DIR$/.idea/colorCOMfinder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../piCamRender/.idea/piCamRender.iml" filepath="$PROJECT_DIR$/../piCamRender/.idea/piCamRender.iml" />
     </modules>
   </component>
 </project>

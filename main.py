@@ -1,5 +1,5 @@
-from piCamRender import picam_render00
-from colorCOMfinder import colorCOMfinder05
+from piCamRender import picam_render00 as pcr0
+from colorCOMfinder import colorCOMfinder05 as comf5
 
-picam_render00.run()
+pcr0.run()
 

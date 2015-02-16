@@ -160,7 +160,7 @@ def color_com(pic, target_arr, px_search_list):
         img_data = np.array(pic)
 
     hit_stack = deque([])
-    hit_px_list = []
+    hit_px_list = deque([])
 
     for px in px_search_list:
         if not img_data[px[0]][px[1]][3] == checked_alpha \

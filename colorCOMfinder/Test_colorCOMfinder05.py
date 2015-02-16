@@ -62,7 +62,7 @@ t.append((time.time() - t0) / n)
 s.append("160x120 gen_px_list")
 print("Generating pixel search list takes", t[-1], "seconds")
 
-test_suite = [1, 2, 3]
+test_suite = [2, 3]
 
 
 # look for red in testPic photos    
@@ -78,7 +78,7 @@ if 1 in test_suite:
 
         t0 = time.time()
         coords = Comf.color_com(test_pic, target, search_list)
-        t.append((time.time() - t0) / n)
+        t.append((time.time() - t0))
         s.append(filename)
         print("Time taken:", t[-1])
 
@@ -117,8 +117,7 @@ if 3 in test_suite:
         search_list = Comf.gen_px_list(res)
         target = Comf.gen_rgb_range(red, picky)
 
-        n = 5
-        t0 = time.time()
+        t0 = time.time(); n = 5
         coords = 0
         for i in range(n):
             coords = Comf.color_com(test_pic, target, search_list)

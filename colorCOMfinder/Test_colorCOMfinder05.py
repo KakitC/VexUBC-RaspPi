@@ -65,7 +65,7 @@ print("Generating pixel search list takes", t[-1], "seconds")
 test_suite = [2, 3]
 
 
-# look for red in testPic photos    
+# Verify search algorithm on testPic photos    
 if 1 in test_suite:
     file_pics = ['testPic' + str(x+1) + '.jpg' for x in range(5)]
     for filename in file_pics:
@@ -126,6 +126,7 @@ if 3 in test_suite:
         print("Time taken:", t[-1])
         print(coords)
 
+# Save test logs with run times for each image
 with open("Test outputs/Test05_log_" + test_name + ".csv",
           'w+b') as f:
     out_text = str(s)[1:-1] + '\n' + str(t)[1:-1]

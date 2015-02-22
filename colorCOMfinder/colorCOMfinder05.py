@@ -14,7 +14,7 @@ from PIL import Image
     Image to find the coordinates of a blob of colour.
 
     'px' is a pixel position coordinate, while 'pixel' is the individual RGB value.
-"""
+    """
 
 
 def gen_px_list(res):
@@ -25,7 +25,7 @@ def gen_px_list(res):
             res - <2-tuple> Size of image array (height, width)
         Returns:
             <List> a list of px coordinates, as a square spiral out from center
-    """
+        """
 
     w,h = res
     ctr = [int(h / 2), int(w / 2)]
@@ -62,6 +62,9 @@ def gen_rgb_range(hls_target, hls_thresh=(20, 50, 50)):
     # Compute RGB coordinates for all the ways you can modify the hls_target
     # values by the threshold values (up, down, or all the same), and keep
     # the min and max R,G,B values from that set.
+
+    # TODO Try using just +/-1 for each H,L,S individually, not all at the
+    #      same time.
 
     # Compute all different HLS target ranges
     hls_list = []
@@ -168,8 +171,9 @@ def color_com(pic, target_arr, px_search_list):
             img_data[px[0]][px[1]][3] = checked_alpha
 
         else:
+            # TODO write a faster blob search algorithm
             # This is still slow, especially on large blotches of hit color
-            # TODO make a perimeter search algorithm as another function
+            # Maybe a perimeter search algorithm as another function
             # print("we got one!")
             hit_stack.append(px)
             hit_px_list.append(px)

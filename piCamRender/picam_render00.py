@@ -17,7 +17,7 @@ def make_overlay(coords, res):
             res - <2-tuple> Camera resolution
         Returns:
             <Image> Image containing targeting dot, padded to overlay buffer size
-    """
+        """
 
     o = np.zeros((res[1], res[0], 3), dtype=np.uint8)
     if 0 <= coords[0] < res[0] and 0 <= coords[1] < res[1]:
@@ -31,6 +31,15 @@ def make_overlay(coords, res):
 
 
 def render_target():
+    """ Read image data from the camera and show camera preview
+        window on screen, overlaying a dot where the target is found.
+
+        Feb 22 notes: typical time .8s per frame, sounds slow but
+        seems acceptable during simple tracking tests. Only works in
+        good lighting. Recommend having an indicator LED when target
+        not detected.
+        """
+
     res = (80, 60)
     target_red = (0, 100, 255)
     thresh = (20, 20, 40)
@@ -49,7 +58,9 @@ def render_target():
         try:
             cam.start_preview()
             t0 = time.time()
-            while time.time() - t0 < 8:
+            while time.time() - t0 < 30:
+                t1 = time.time()
+                stream.seek(0)  # reset stream
                 cam.capture(stream, format='jpeg')
                 stream.seek(0)
                 image = img.open(stream)
@@ -57,8 +68,7 @@ def render_target():
                 print(coords)
                 opad = make_overlay(coords, res)
                 olay.update(opad.tostring())
-                time.sleep(.05)
-                print(time.time() - t0)
+                print(time.time() - t1)
         finally:
             cam.remove_overlay(olay)
             cam.stop_preview()

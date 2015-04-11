@@ -34,6 +34,8 @@ def render_target():
     """ Read image data from the camera and show camera preview
         window on screen, overlaying a dot where the target is found.
 
+        Used for testing colorCOMfinder
+
         Feb 22 notes: typical time .8s per frame, sounds slow but
         seems acceptable during simple tracking tests. Only works in
         good lighting. Recommend having an indicator LED when target

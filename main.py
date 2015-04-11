@@ -1,5 +1,6 @@
 from piCamRender import picam_render00 as pcr0
 from colorCOMfinder import colorCOMfinder05 as comf5
+from cortexController import cortex_command00 as cxc0
 
 """ This is a Main() file in a parent directory to manage 
     different code modules and allow interdependencies.
